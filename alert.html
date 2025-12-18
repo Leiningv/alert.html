@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Incident Message Generator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Google Maps Places API -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=PASTE_YOUR_API_KEY_HERE&libraries=places"></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; background: #f2f2f2; padding: 20px; }
+    .box { background: #fff; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; }
+    input, textarea, button {
+      width: 100%;
+      padding: 12px;
+      margin-top: 10px;
+      margin-bottom: 24px; /* extra spacing between rows */
+      font-size: 16px;
+    }
+    button { background: #c00; color: white; border: none; border-radius: 6px; }
+    textarea { height: 160px; }
+    .quick-buttons button { background:#444; margin-top:6px; }
+  </style>
+</head>
+
+<body>
+  <div class="box">
+    <h2>Incident Message Generator</h2>
+
+    <!-- Quick FDNY Buttons -->
+    <div class="quick-buttons">
+      <button onclick="setNature('10-75')">10-75</button>
+      <button onclick="setNature('ALL HANDS')">ALL HANDS</button>
+      <button onclick="setNature('AUTO ACCIDENT')">AUTO ACCIDENT</button>
+      <button onclick="setNature('EMS ASSIGNMENT')">EMS</button>
+    </div>
+
+    <input id="nature" placeholder="Nature / FDNY Code" />
+    <input id="location" placeholder="Start typing NYC address" />
+    <input id="boxnum" placeholder="Box Number" />
+
+    <button onclick="generate()">Generate Message</button>
+
+    <textarea id="output" placeholder="Generated message"></textarea>
+    <button onclick="copyText()">Copy Message</button>
+  </div>
+
+<script>
+let autocomplete;
+
+function initAutocomplete() {
+  autocomplete = new google.maps.places.Autocomplete(
+    document.getElementById('location'),
+    {
+      types: ['address'],
+      componentRestrictions: { country: 'us' }
+    }
+  );
+}
+
+window.onload = initAutocomplete;
+
+function setNature(value) {
+  document.getElementById('nature').value = value;
+}
+
+function generate() {
+  const nature = document.getElementById('nature').value.toUpperCase().trim();
+  const location = document.getElementById('location').value.toUpperCase().trim();
+  const box = document.getElementById('boxnum').value.toUpperCase().trim();
+
+  if (!location) {
+    alert('Please select a valid NYC address');
+    return;
+  }
+
+  const maps = 'https://maps.google.com/?q=' + encodeURIComponent(location);
+
+  const message = `*${nature}*\n*${location}*\n*BOX ${box}*\nMap: ${maps}`;
+
+  document.getElementById('output').value = message;
+}
+
+function copyText() {
+  const text = document.getElementById('output');
+  text.select();
+  document.execCommand('copy');
+  alert('Message copied. Paste into WhatsApp.');
+}
+</script>
+
+</body>
+</html>
