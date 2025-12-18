@@ -4,22 +4,45 @@
   <title>Incident Message Generator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Google Maps Places API -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=PASTE_YOUR_API_KEY_HERE&libraries=places"></script>
+  <!-- Google Maps Places API (CORRECT LOAD) -->
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDv-jLoI0ocBOqCounpv04CTmkNN6NmkEg&libraries=places&callback=initAutocomplete"
+    async
+    defer>
+  </script>
 
   <style>
-    body { font-family: Arial, sans-serif; background: #f2f2f2; padding: 20px; }
-    .box { background: #fff; padding: 20px; border-radius: 10px; max-width: 500px; margin: auto; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f2f2;
+      padding: 20px;
+    }
+    .box {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 500px;
+      margin: auto;
+    }
     input, textarea, button {
       width: 100%;
-      padding: 12px;
-      margin-top: 10px;
-      margin-bottom: 24px; /* extra spacing between rows */
-      font-size: 16px;
+      padding: 14px;
+      margin-bottom: 24px;
+      font-size: 18px;
     }
-    button { background: #c00; color: white; border: none; border-radius: 6px; }
-    textarea { height: 160px; }
-    .quick-buttons button { background:#444; margin-top:6px; }
+    button {
+      background: #c00;
+      color: white;
+      border: none;
+      border-radius: 6px;
+    }
+    textarea {
+      height: 160px;
+    }
+    .quick-buttons button {
+      background: #444;
+      margin-bottom: 12px;
+    }
   </style>
 </head>
 
@@ -27,7 +50,6 @@
   <div class="box">
     <h2>Incident Message Generator</h2>
 
-    <!-- Quick FDNY Buttons -->
     <div class="quick-buttons">
       <button onclick="setNature('10-75')">10-75</button>
       <button onclick="setNature('ALL HANDS')">ALL HANDS</button>
@@ -36,7 +58,7 @@
     </div>
 
     <input id="nature" placeholder="Nature / FDNY Code" />
-    <input id="location" placeholder="Start typing NYC address" />
+    <input id="location" placeholder="Start typing address" />
     <input id="boxnum" placeholder="Box Number" />
 
     <button onclick="generate()">Generate Message</button>
@@ -58,8 +80,6 @@ function initAutocomplete() {
   );
 }
 
-window.onload = initAutocomplete;
-
 function setNature(value) {
   document.getElementById('nature').value = value;
 }
@@ -70,13 +90,17 @@ function generate() {
   const box = document.getElementById('boxnum').value.toUpperCase().trim();
 
   if (!location) {
-    alert('Please select a valid NYC address');
+    alert('Please select a valid address');
     return;
   }
 
   const maps = 'https://maps.google.com/?q=' + encodeURIComponent(location);
 
-  const message = `*${nature}*\n*${location}*\n*BOX ${box}*\nMap: ${maps}`;
+  const message =
+`*${nature}*
+*${location}*
+*BOX ${box}*
+Map: ${maps}`;
 
   document.getElementById('output').value = message;
 }
