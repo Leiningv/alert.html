@@ -4,7 +4,7 @@
   <title>Incident Message Generator</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- Google Maps Places API (CORRECT LOAD) -->
+  <!-- Google Maps Places API -->
   <script
     src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDv-jLoI0ocBOqCounpv04CTmkNN6NmkEg&libraries=places&callback=initAutocomplete"
     async
@@ -19,15 +19,15 @@
     }
     .box {
       background: #fff;
-      padding: 20px;
+      padding: 24px;
       border-radius: 10px;
       max-width: 500px;
       margin: auto;
     }
     input, textarea, button {
       width: 100%;
-      padding: 14px;
-      margin-bottom: 24px;
+      padding: 16px;
+      margin-bottom: 28px; /* 2 rows spacing */
       font-size: 18px;
     }
     button {
@@ -37,11 +37,11 @@
       border-radius: 6px;
     }
     textarea {
-      height: 160px;
+      height: 180px;
     }
     .quick-buttons button {
       background: #444;
-      margin-bottom: 12px;
+      margin-bottom: 14px;
     }
   </style>
 </head>
@@ -50,6 +50,7 @@
   <div class="box">
     <h2>Incident Message Generator</h2>
 
+    <!-- Quick FDNY buttons -->
     <div class="quick-buttons">
       <button onclick="setNature('10-75')">10-75</button>
       <button onclick="setNature('ALL HANDS')">ALL HANDS</button>
@@ -97,9 +98,15 @@ function generate() {
   const maps = 'https://maps.google.com/?q=' + encodeURIComponent(location);
 
   const message =
-`*${nature}*
+`🚨 *${nature}* 🚨
+
+
 *${location}*
+
+
 *BOX ${box}*
+
+
 Map: ${maps}`;
 
   document.getElementById('output').value = message;
