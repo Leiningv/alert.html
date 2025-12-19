@@ -29,7 +29,7 @@
     input {
       width: 100%;
       padding: 12px;
-      font-size: 16px; /* prevents iOS zoom */
+      font-size: 16px;
       margin-top: 6px;
       box-sizing: border-box;
     }
@@ -44,7 +44,7 @@
 
     textarea {
       width: 100%;
-      height: 220px;
+      height: 240px;
       margin-top: 20px;
       padding: 12px;
       font-size: 16px;
@@ -100,13 +100,13 @@
         encodeURIComponent(address);
 
       const message =
-`🚨 *${nature}* 🚨
+`🚨 *NATURE: ${nature}* 🚨
 
 
-*${address}*
+*ADDRESS: ${address}*
 
 
-*BOX ${box}*
+*BOX: ${box}*
 
 
 Map: ${mapLink}`;
@@ -117,7 +117,7 @@ Map: ${mapLink}`;
     function copyMessage() {
       const output = document.getElementById("output");
       output.select();
-      output.setSelectionRange(0, 99999); // mobile support
+      output.setSelectionRange(0, 99999);
       document.execCommand("copy");
       alert("Message copied");
     }
@@ -131,3 +131,4 @@ Map: ${mapLink}`;
 
 </body>
 </html>
+
