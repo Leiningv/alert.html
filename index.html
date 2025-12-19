@@ -92,6 +92,12 @@
 
       if (!nature || !address || !box) {
         alert("Please fill in Nature, Address, and Box Number.");
+        let address = document.getElementById("address").value.trim().toUpperCase();
+
+if (!address.includes("NY")) {
+  address += ", BROOKLYN NY";
+}
+
         return;
       }
 
@@ -131,5 +137,6 @@ Map: ${mapLink}`;
 
 </body>
 </html>
+
 
 
