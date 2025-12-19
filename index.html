@@ -1,124 +1,133 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Incident Message Generator</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Google Maps Places API -->
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDv-jLoI0ocBOqCounpv04CTmkNN6NmkEg&libraries=places&callback=initAutocomplete"
-    async
-    defer>
-  </script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>FDNY Alert Generator</title>
 
   <style>
     body {
       font-family: Arial, sans-serif;
-      background: #f2f2f2;
-      padding: 20px;
-    }
-    .box {
-      background: #fff;
-      padding: 24px;
-      border-radius: 10px;
-      max-width: 500px;
+      background: #ffffff;
+      padding: 16px;
+      max-width: 480px;
       margin: auto;
     }
-    input, textarea, button {
+
+    h1 {
+      text-align: center;
+      font-size: 20px;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 16px;
+      font-weight: bold;
+    }
+
+    input {
       width: 100%;
-      padding: 16px;
-      margin-bottom: 28px; /* 2 rows spacing */
-      font-size: 18px;
+      padding: 12px;
+      font-size: 16px; /* prevents iOS zoom */
+      margin-top: 6px;
+      box-sizing: border-box;
     }
+
     button {
-      background: #c00;
-      color: white;
-      border: none;
-      border-radius: 6px;
+      width: 100%;
+      padding: 14px;
+      font-size: 16px;
+      margin-top: 20px;
+      cursor: pointer;
     }
+
     textarea {
-      height: 180px;
-    }
-    .quick-buttons button {
-      background: #444;
-      margin-bottom: 14px;
+      width: 100%;
+      height: 220px;
+      margin-top: 20px;
+      padding: 12px;
+      font-size: 16px;
+      box-sizing: border-box;
     }
   </style>
 </head>
 
 <body>
-  <div class="box">
-    <h2>Incident Message Generator</h2>
 
-    <!-- Quick FDNY buttons -->
-    <div class="quick-buttons">
-      <button onclick="setNature('10-75')">10-75</button>
-      <button onclick="setNature('ALL HANDS')">ALL HANDS</button>
-      <button onclick="setNature('AUTO ACCIDENT')">AUTO ACCIDENT</button>
-      <button onclick="setNature('EMS ASSIGNMENT')">EMS</button>
-    </div>
+  <h1>FDNY WhatsApp Alert</h1>
 
-    <input id="nature" placeholder="Nature / FDNY Code" />
-    <input id="location" placeholder="Start typing address" />
-    <input id="boxnum" placeholder="Box Number" />
+  <label for="nature">Nature / FDNY Code</label>
+  <input type="text" id="nature" placeholder="10-75">
 
-    <button onclick="generate()">Generate Message</button>
+  <label for="address">Address</label>
+  <input type="text" id="address" placeholder="Start typing address">
 
-    <textarea id="output" placeholder="Generated message"></textarea>
-    <button onclick="copyText()">Copy Message</button>
-  </div>
+  <label for="box">Box Number</label>
+  <input type="text" id="box" placeholder="9672">
 
-<script>
-let autocomplete;
+  <button onclick="generateMessage()">Generate Message</button>
 
-function initAutocomplete() {
-  autocomplete = new google.maps.places.Autocomplete(
-    document.getElementById('location'),
-    {
-      types: ['address'],
-      componentRestrictions: { country: 'us' }
+  <textarea id="output" readonly></textarea>
+
+  <button onclick="copyMessage()">Copy</button>
+
+  <script>
+    let autocomplete;
+
+    function initAutocomplete() {
+      autocomplete = new google.maps.places.Autocomplete(
+        document.getElementById("address"),
+        {
+          types: ["address"],
+          componentRestrictions: { country: "us" }
+        }
+      );
     }
-  );
-}
 
-function setNature(value) {
-  document.getElementById('nature').value = value;
-}
+    function generateMessage() {
+      const nature = document.getElementById("nature").value.trim().toUpperCase();
+      const address = document.getElementById("address").value.trim().toUpperCase();
+      const box = document.getElementById("box").value.trim().toUpperCase();
 
-function generate() {
-  const nature = document.getElementById('nature').value.toUpperCase().trim();
-  const location = document.getElementById('location').value.toUpperCase().trim();
-  const box = document.getElementById('boxnum').value.toUpperCase().trim();
+      if (!nature || !address || !box) {
+        alert("Please fill in Nature, Address, and Box Number.");
+        return;
+      }
 
-  if (!location) {
-    alert('Please select a valid address');
-    return;
-  }
+      const mapLink =
+        "https://maps.google.com/?q=" +
+        encodeURIComponent(address);
 
-  const maps = 'https://maps.google.com/?q=' + encodeURIComponent(location);
-
-  const message =
+      const message =
 `🚨 *${nature}* 🚨
 
 
-*${location}*
+*${address}*
 
 
 *BOX ${box}*
 
 
-Map: ${maps}`;
+Map: ${mapLink}`;
 
-  document.getElementById('output').value = message;
-}
+      document.getElementById("output").value = message;
+    }
 
-function copyText() {
-  const text = document.getElementById('output');
-  text.select();
-  document.execCommand('copy');
-  alert('Message copied. Paste into WhatsApp.');
-}
-</script>
+    function copyMessage() {
+      const output = document.getElementById("output");
+      output.select();
+      output.setSelectionRange(0, 99999); // mobile support
+      document.execCommand("copy");
+      alert("Message copied");
+    }
+  </script>
+
+  <script
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDv-jLoI0ocBOqCounpv04CTmkNN6NmkEg&libraries=places&callback=initAutocomplete"
+    async
+    defer>
+  </script>
 
 </body>
 </html>
