@@ -1,114 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>FDNY Alert Generator</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FDNY WhatsApp Alert</title>
 
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #ffffff;
-      padding: 16px;
-      max-width: 480px;
-      margin: auto;
-    }
-
-    h1 {
-      text-align: center;
-      font-size: 20px;
-      margin-bottom: 20px;
-    }
-
-    label {
-      display: block;
-      margin-top: 16px;
-      font-weight: bold;
-    }
-
-    input {
-      width: 100%;
-      padding: 12px;
-      font-size: 16px;
-      margin-top: 6px;
-      box-sizing: border-box;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      font-size: 16px;
-      margin-top: 20px;
-      cursor: pointer;
-    }
-
-    textarea {
-      width: 100%;
-      height: 240px;
-      margin-top: 20px;
-      padding: 12px;
-      font-size: 16px;
-      box-sizing: border-box;
-    }
-  </style>
+<style>
+body {
+  font-family: Arial, sans-serif;
+  padding: 16px;
+  max-width: 480px;
+  margin: auto;
+}
+label {
+  display: block;
+  margin-top: 16px;
+  font-weight: bold;
+}
+input, textarea, button {
+  width: 100%;
+  padding: 12px;
+  font-size: 16px;
+  margin-top: 6px;
+}
+textarea { height: 280px; }
+button { margin-top: 20px; }
+</style>
 </head>
 
 <body>
 
-  <h1>FDNY WhatsApp Alert</h1>
+<label>Nature / FDNY Code</label>
+<input
+  id="nature"
+  list="fdny-codes"
+  placeholder="10-75, 1053, 10-25 CODE 2">
 
-  <label for="nature">Nature / FDNY Code</label>
-  <input type="text" id="nature" placeholder="10-75">
+<datalist id="fdny-codes">
+  <option value="10-75">10-75 – WORKING FIRE</option>
+  <option value="10-60">10-60 – MAJOR EMERGENCY</option>
+  <option value="10-66">10-66 – FIREFIGHTER EMERGENCY</option>
+  <option value="10-76">10-76 – HIGH RISE FIRE</option>
+  <option value="10-77">10-77 – HIGH RISE MULTIPLE DWELLING</option>
+  <option value="10-25">10-25 – MANHOLE OR TRANSFORMER FIRE</option>
+  <option value="10-36">10-36 – AUTO ACCIDENT</option>
+  <option value="10-38">10-38 – CARBON MONOXIDE</option>
+  <option value="10-28">10-28 – SUBWAY / RAILROAD FIRE</option>
+  <option value="10-80">10-80 – HAZMAT INCIDENT</option>
+</datalist>
 
-  <label for="address">Address or Cross Streets</label>
-  <input
-    type="text"
-    id="address"
-    placeholder="946 52ND ST or Ocean Pkwy & Church Ave">
+<label>Address or Cross Streets</label>
+<input id="address" placeholder="Ocean Pkwy & Church Ave">
 
-  <label for="box">Box Number</label>
-  <input type="text" id="box" placeholder="9672">
+<label>Box Number</label>
+<input id="box" placeholder="9672">
 
-  <button onclick="generateMessage()">Generate Message</button>
+<button onclick="generateMessage()">Generate</button>
 
-  <textarea id="output" readonly></textarea>
+<textarea id="output" readonly></textarea>
 
-  <button onclick="copyMessage()">Copy</button>
+<button onclick="copyMessage()">Copy</button>
 
-  <script>
-    let autocomplete;
+<script>
+const FDNY_CODES = {
+  "10-9": "OFF THE AIR",
+  "10-10": "CURRENT LOCATION",
+  "10-11": "RADIO TEST COUNT",
+  "10-12": "PRELIMINARY REPORT REQUESTED",
+  "10-14": "ROSTER STAFFED ENGINE",
+  "10-18": "RETURN ALL UNITS EXCEPT 1 ENGINE AND 1 LADDER",
+  "10-19": "RETURN ALL UNITS EXCEPT 1 ENGINE OR 1 LADDER",
+  "10-20": "PROCEED TO BOX AT REDUCED SPEED",
+  "10-21": "BRUSH FIRE",
+  "10-22": "OUTSIDE RUBBISH FIRE",
+  "10-23": "ABANDONED VEHICLE FIRE",
+  "10-24": "AUTO FIRE",
+  "10-25": "MANHOLE OR TRANSFORMER FIRE",
+  "10-26": "FOOD ON STOVE",
+  "10-27": "COMPACTOR / INCINERATOR FIRE",
+  "10-28": "SUBWAY OR RAILROAD FIRE",
+  "10-31": "ASSIST CIVILIAN",
+  "10-32": "DEFECTIVE OIL BURNER",
+  "10-33": "ODOR CONDITION",
+  "10-34": "SPRINKLER SYSTEM EMERGENCY",
+  "10-35": "UNWARRANTED ALARM",
+  "10-36": "AUTO ACCIDENT",
+  "10-37": "MEDICAL ASSIGNMENT",
+  "10-38": "CARBON MONOXIDE RESPONSE",
+  "10-39": "FD STANDBY AT INTERAGENCY INCIDENT",
+  "10-40": "UTILITY EMERGENCY",
+  "10-41": "FIRE MARSHAL INVESTIGATION",
+  "10-42": "DOWN TREE",
+  "10-43": "NON-FIRE RESCUE",
+  "10-44": "REQUEST PUBLIC AMBULANCE",
+  "10-45": "CIVILIAN DOA OR SERIOUS INJURY – FIRE RELATED",
+  "10-46": "MARITIME FIRE OR EMERGENCY",
+  "10-47": "REQUEST POLICE",
+  "10-48": "REQUEST POLICE FORTHWITH",
+  "10-51": "SUSPENSION OF OUTSIDE ACTIVITIES",
+  "10-60": "MAJOR EMERGENCY RESPONSE",
+  "10-66": "MISSING / TRAPPED / INJURED MEMBER",
+  "10-70": "NO WATER SUPPLY",
+  "10-75": "WORKING FIRE",
+  "10-76": "HIGH-RISE FIRE",
+  "10-77": "HIGH-RISE MULTIPLE DWELLING FIRE",
+  "10-80": "HAZARDOUS MATERIALS INCIDENT",
+  "10-84": "ANNOUNCE ARRIVAL AT BOX",
+  "10-85": "FIRE MARSHAL REQUIRES POLICE",
+  "10-86": "ALCOHOL RESISTANT FOAM OPERATION",
+  "10-87": "HIGH EXPANSION FOAM OPERATION"
+};
 
-    function initAutocomplete() {
-      autocomplete = new google.maps.places.Autocomplete(
-        document.getElementById("address"),
-        {
-          types: ["geocode"],
-          componentRestrictions: { country: "us" }
-        }
-      );
-    }
+const SUBCODES = {
+  "10-25 CODE 1": "FIRE EXTENDED INTO BUILDING",
+  "10-25 CODE 2": "COVER BLOWN OR SMOKE UNDER PRESSURE",
+  "10-25 CODE 3": "SMOKE SEEPING FROM MANHOLE",
+  "10-25 CODE 4": "TRANSFORMER FIRE",
+  "10-36 CODE 1": "WASHDOWN",
+  "10-36 CODE 2": "ACCIDENT – NO INJURIES",
+  "10-36 CODE 3": "ACCIDENT WITH INJURIES",
+  "10-36 CODE 4": "ACCIDENT REQUIRING EXTRICATION"
+};
 
-    function generateMessage() {
-      const nature = document.getElementById("nature").value.trim().toUpperCase();
-      let address = document.getElementById("address").value.trim().toUpperCase();
-      const box = document.getElementById("box").value.trim().toUpperCase();
+function normalizeCode(input) {
+  let t = input.toUpperCase().trim().replace(/\s+/g, " ");
+  if (/^\d{4}$/.test(t)) t = t.slice(0,2) + "-" + t.slice(2);
+  return t;
+}
 
-      if (!nature || !address || !box) {
-        alert("Please fill in Nature, Address, and Box Number.");
-        return;
-      }
+function generateMessage() {
+  let raw = document.getElementById("nature").value;
+  let nature = normalizeCode(raw);
+  let address = document.getElementById("address").value.trim().toUpperCase();
+  let box = document.getElementById("box").value.trim().toUpperCase();
 
-      // 🔒 FORCE CONTEXT FOR INTERSECTIONS
-      if (!address.includes("NY")) {
-        address += ", BROOKLYN NY";
-      }
+  let desc = FDNY_CODES[nature];
+  let sub = SUBCODES[nature];
 
-      const mapLink =
-        "https://maps.google.com/?q=" +
-        encodeURIComponent(address);
+  let finalNature = desc
+    ? `${nature} – ${sub || desc}`
+    : raw.toUpperCase();
 
-      const message =
-`🚨 *NATURE: ${nature}* 🚨
+  if (!address.includes("NY")) address += ", BROOKLYN NY";
+
+  const mapLink = "https://maps.google.com/?q=" + encodeURIComponent(address);
+
+  document.getElementById("output").value =
+`🚨 *NATURE: ${finalNature}* 🚨
 
 
 *ADDRESS: ${address}*
@@ -118,24 +156,16 @@
 
 
 Map: ${mapLink}`;
+}
 
-      document.getElementById("output").value = message;
-    }
+function copyMessage() {
+  const o = document.getElementById("output");
+  o.select();
+  document.execCommand("copy");
+}
+</script>
 
-    function copyMessage() {
-      const output = document.getElementById("output");
-      output.select();
-      output.setSelectionRange(0, 99999);
-      document.execCommand("copy");
-      alert("Message copied");
-    }
-  </script>
-
-  <script
-    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDv-jLoI0ocBOqCounpv04CTmkNN6NmkEg&libraries=places&callback=initAutocomplete"
-    async
-    defer>
-  </script>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDv-jLoI0ocBOqCounpv04CTmkNN6NmkEg&libraries=places"></script>
 
 </body>
 </html>
