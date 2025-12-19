@@ -60,8 +60,11 @@
   <label for="nature">Nature / FDNY Code</label>
   <input type="text" id="nature" placeholder="10-75">
 
-  <label for="address">Address</label>
-  <input type="text" id="address" placeholder="Start typing address">
+  <label for="address">Address or Cross Streets</label>
+  <input
+    type="text"
+    id="address"
+    placeholder="946 52ND ST or Ocean Pkwy & Church Ave">
 
   <label for="box">Box Number</label>
   <input type="text" id="box" placeholder="9672">
@@ -79,7 +82,7 @@
       autocomplete = new google.maps.places.Autocomplete(
         document.getElementById("address"),
         {
-          types: ["address"],
+          types: ["geocode"],
           componentRestrictions: { country: "us" }
         }
       );
@@ -87,23 +90,22 @@
 
     function generateMessage() {
       const nature = document.getElementById("nature").value.trim().toUpperCase();
-      const address = document.getElementById("address").value.trim().toUpperCase();
+      let address = document.getElementById("address").value.trim().toUpperCase();
       const box = document.getElementById("box").value.trim().toUpperCase();
 
       if (!nature || !address || !box) {
         alert("Please fill in Nature, Address, and Box Number.");
-        let address = document.getElementById("address").value.trim().toUpperCase();
-
-if (!address.includes("NY")) {
-  address += ", BROOKLYN NY";
-}
-
         return;
+      }
+
+      // 🔒 FORCE CONTEXT FOR INTERSECTIONS
+      if (!address.includes("NY")) {
+        address += ", BROOKLYN NY";
       }
 
       const mapLink =
         "https://maps.google.com/?q=" +
-        encodeURIComponent(geocode);
+        encodeURIComponent(address);
 
       const message =
 `🚨 *NATURE: ${nature}* 🚨
@@ -137,6 +139,3 @@ Map: ${mapLink}`;
 
 </body>
 </html>
-
-
-
